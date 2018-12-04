@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset="UTF-8">
+    <title>photoflash</title>
+    <link rel="stylesheet" type="text/css" href="style/zns_style.css">
+    <script src="js/move1.js"></script>
+    <script>
+        function getByClass(oParent, sClass){
+            var elem = oParent.getElementsByTagName("*");
+            var result = [];
+            for(var i=0; i<elem.length; i++){
+                if(elem[i].className == sClass){
+                    result.push(elem[i]);
+                }
+            }
+            return result;
+        }
+
+        window.onload = function(){
+            var oDiv = document.getElementById("playimages");
+            var prev = getByClass(oDiv, "prev")[0];
+            var next = getByClass(oDiv, "next")[0];
+            var mLeft = getByClass(oDiv, "mark_left")[0];
+            var mRight = getByClass(oDiv, "mark_right")[0];
+
+            var oDivSmall = getByClass(oDiv, "small_pic")[0];
+            var oUlSmall = oDivSmall.getElementsByTagName("ul")[0];
+            var oLiSmall = oDivSmall.getElementsByTagName("li");
+
+            var oUlBig = getByClass(oDiv, "big_pic")[0];
+            var oLiBig = oUlBig.getElementsByTagName("li");
+
+            oUlSmall.style.width = oLiSmall.length * oLiSmall[0].offsetWidth + "px";
+
+            var nowZIndex = 2;
+
+            // arrow choose
+            mLeft.onmouseover = prev.onmouseover= function(){
+              startMove(prev, "opacity", 100);
+            };
+            mLeft.onmouseout = prev.onmouseout= function(){
+                startMove(prev, "opacity", 0);
+            };
+            mRight.onmouseover = next.onmouseover= function(){
+                startMove(next, "opacity", 100);
+            };
+            mRight.onmouseout = next.onmouseout= function(){
+                startMove(next, "opacity", 0);
+            };
+
+            // big photos choose
+            now=0;
+            for(var i=0; i<oLiSmall.length; i++){
+
+                oLiSmall[i].index = i;
+                oLiSmall[i].onclick = function(){
+                    if(now == this.index)return;
+                    now = this.index;
+                    tab();
+                };
+
+                oLiSmall[i].onmouseover = function(){
+                    startMove(this, "opacity" , 100);
+                };
+                oLiSmall[i].onmouseout = function(){
+                    if(now != this.index){
+                        startMove(this, "opacity" , 60);
+                    }
+                };
+            }
+
+            function tab(){
+                oLiBig[now].style.zIndex = nowZIndex++;
+                oLiBig[now].style.height = 0;
+                startMove(oLiBig[now], "height", 320);
+
+                for(var j=0; j<oLiSmall.length; j++){
+                    startMove(oLiSmall[j], "opacity", 60);
+                }
+                startMove(oLiSmall[now], "opacity", 100);
+
+                if(now==0){
+                    startMove(oUlSmall, "left", 0);
+                }
+                else if(now==oLiSmall.length-1){
+                    startMove(oUlSmall, "left", -(now-2)*oLiSmall[0].offsetWidth);
+                }
+                else{
+                    startMove(oUlSmall, "left", -(now-1)*oLiSmall[0].offsetWidth);
+                }
+            }
+
+            prev.onclick = function(){
+                now--;
+                if(now == -1){
+                    now = oLiSmall.length-1;
+                }
+                tab();
+            }
+            next.onclick = function(){
+                now++;
+                if(now == oLiSmall.length){
+                    now = 0;
+                }
+                tab();
+            }
+
+            var timer = setInterval(next.onclick,2000);
+
+            oDiv.onmouseover = function(){
+                clearInterval(timer);
+            }
+            oDiv.onmouseout = function(){
+                setInterval(timer);
+            }
+
+        }
+
+
+
+    </script>
+</head>
+<body>
+<div id="playimages" class="play">
+    <ul class="big_pic">
+
+        <div class="prev"></div>
+        <div class="next"></div>
+
+        <a class="mark_left" href="javascript:;"></a>
+        <a class="mark_right" href="javascript:;"></a>
+        <div class="bg"></div>
+
+        <li style="z-index:1;"><img src="images/1.jpg" /></li>
+        <li><img src="images/2.jpg" /></li>
+        <li><img src="images/3.jpg" /></li>
+        <li><img src="images/4.jpg" /></li>
+        <li><img src="images/5.jpg" /></li>
+        <li><img src="images/6.jpg" /></li>
+    </ul>
+    <div class="small_pic">
+        <ul style="width:390px;">
+            <li style="filter: 100; opacity: 1;"><img src="images/1.jpg" /></li>
+            <li><img src="images/2.jpg" /></li>
+            <li><img src="images/3.jpg" /></li>
+            <li><img src="images/4.jpg" /></li>
+            <li><img src="images/5.jpg" /></li>
+            <li><img src="images/6.jpg" /></li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>
